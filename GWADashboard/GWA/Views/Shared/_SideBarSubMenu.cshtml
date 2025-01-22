@@ -1,0 +1,51 @@
+﻿@using GWA.DataDashboard;
+@using GWA.Models;
+@using Microsoft.AspNetCore.Http;
+@using GWA.Classes;
+@using Microsoft.Extensions.Logging;
+
+@inject IHttpContextAccessor _httpContextAccessor;
+@inject DashboardDbContext _db;
+@inject ILoggerFactory loggerFactory;
+
+@model List<MenuItem>;
+
+@{
+    var logger = loggerFactory.CreateLogger("View");
+
+    @foreach (var item in Model)
+    {
+        if (!Utils.CheckPermission(_db, User, item.permissionEnumText, logger))
+        {
+            continue;
+        }
+
+        var action = (item.jsFunction.Equals("") ? item.location : item.jsFunction);
+        string icon = "fa fa-none";
+
+        if (item.icon != null && !item.icon.Equals(""))
+        {
+            icon = item.icon;
+        }
+
+        <li id="menu-item-@item.id">
+            <a href="@Html.Raw((item.items.Count() > 0) ? "javascript:;" : $"javascript:{action};") " class="nav-link">
+                <i class="@icon"></i>
+                <span class="title">@item.text</span>
+                @if (item.items.Count() > 0)
+                {
+                    <span class="arrow "></span>
+                }
+                <span class="selected"></span>
+            </a>
+
+            @if (item.items.Count() > 0)
+            {
+                <ul class="sub-menu">
+                    @await Html.PartialAsync("_SideBarSubMenu", item.items)
+                </ul>
+            }
+
+        </li>
+    }
+}

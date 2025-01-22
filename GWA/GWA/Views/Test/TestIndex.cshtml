@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script>
+    function FB_post_feed(method, name, link, picture, caption, description) {
+        FB.login(function (response) {
+            var token = response.authResponse.accessToken;
+            var userid = response.authResponse.userID;
+            debugger
+            $.ajax({
+                url: "/api/test",
+                type: "get",
+                data: {
+                    'token': token,
+                    'userid': userid,
+                },
+            })
+            FB.ui({
+                method: 'share_open_graph',
+		        action_type: 'og.likes',
+                action_properties: JSON.stringify({
+                    object : {
+                       'og:url': 'http://enter.online/ru/',
+                       'og:title': 'Green hills',
+                       'og:description': 'Заходите в Грин Хиллс! У нас вкусная кулинария и большой ассортимент!',
+                       'og:image': 'http://fbrell.com/f8.jpg'
+                    }
+                })
+                //method: 'feed',
+                //name: 'Green hills',
+                //link: 'https://gwa-net.com/',
+                //source: 'https://lh3.googleusercontent.com/proxy/iluUUpmeG0voLaybskX3eaqmymjmnDNkl4nfrirYm5AaWckGfunA2I3VJ2XovCM6fWig0ix0ZXoTM5M',
+                //caption: 'Green Hills!',
+                //message: 'Заходите в Грин Хиллс! У нас вкусная кулинария и большой ассортимент!'
+            }, function (response) {
+                debugger
+            });
+        });
+    }
+</script>
+
+<button style="color: black; background-color: lightblue; margin:120px auto; display:block;" onclick="FB_post_feed()">
+    Share on Facebook
+</button>
+
+<script>
+    $(function () {
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '2675839475989032',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v2.5'
+            });
+        };
+    })
+</script>

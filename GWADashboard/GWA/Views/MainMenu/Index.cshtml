@@ -1,0 +1,260 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    Layout = null;
+}
+
+@using (Html.DevExtreme().NamedTemplate("popup-template-info"))
+{
+    <div id="scrollview-demo">
+        @(Html.DevExtreme().ScrollView()
+            .ID("scrollview")
+            .ScrollByContent(true)
+            .ScrollByThumb(true)
+            .Height(750)
+            //.OnReachBottom("scrollView_reachBottom")
+            //.ReachBottomText("Updating...")
+            .ShowScrollbar(ShowScrollbarMode.Always)
+            .OnUpdated("upd")
+            .Content(@<text>
+                        @await Html.PartialAsync("SelectIcons")
+
+            </text>)
+        )
+    </div>
+}
+
+
+<script>
+    var cellIdForIcon = null;
+    function upd(args) {
+        if ($(event.target).text() != "") {
+            $("#table-icon").click(function (event) {
+                event.preventDefault();
+                if ($("#popup-snapshorts").dxPopup('instance')._currentVisible == true) {
+                    var child = null;
+                    var result = null;
+                    if ($(event.target.children.length > 0)) {
+                        child = $(event.target.children);
+                        result = child.attr("class");
+                    }
+                    else {
+                        result = $(event.target.className).selector;
+
+                    }
+                    if (result != undefined && (result[0] == "f" || result[0] == "i" || result[0] == "g")) {
+                        //alert(result);
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/mainmenu/changeIcon",
+                            data: {
+                                cellIdForIcon: cellIdForIcon,
+                                result: result
+                            },
+                            success: function () {
+                                $("#menu-tree-list").dxTreeList('instance').endCustomLoading("");
+                                $("#menu-tree-list").dxTreeList('instance').refresh();
+                            },
+                            error: function (e) {
+                                $("#menu-tree-list").dxTreeList('instance').endCustomLoading("");
+                                toastr["error"]("HTTP Status: " + e.status);
+                            }
+                        });
+
+                        $("#popup-snapshorts").dxPopup("toggle", false)
+                    }
+                }
+            });
+        }
+    }
+
+
+    var mainmenu = {
+        dxTreeList: undefined,
+
+        menuTree_RowPrepared: function (e) {
+            if (e.rowType != 'data')
+                return;
+            e.rowElement
+                .addClass('myRow')
+                .data('keyValue', e.key);
+        },
+
+        menuTree_CellClick: function (e) {
+            if (e.rowType == 'header')
+                return;
+            if (e.column.dataField == "Icon") {
+                cellIdForIcon = e.data.Id;
+                snapshortPopup.option("contentTemplate", $("#popup-template-info"));
+                snapshortPopup.show();
+            }
+        },
+
+        menuTree_ContentReady: function (e) {
+            mainmenu.initDragging(e.element);
+        },
+
+        initDragging: function ($treeElement) {
+            $treeElement.find('.myRow').draggable({
+                helper: 'clone',
+                start: function (event, ui) {
+                    var $originalRow = $(this),
+                        $clonedRow = ui.helper;
+                    var $originalRowCells = $originalRow.children(),
+                        $clonedRowCells = $clonedRow.children();
+                    for (var i = 0; i < $originalRowCells.length; i++)
+                        $($clonedRowCells.get(i)).width($($originalRowCells.get(i)).width());
+                    $clonedRow
+                        .width($originalRow.width())
+                        .addClass('drag-helper');
+                }
+            });
+            $treeElement.find('.myRow').droppable({
+                drop: function (event, ui) {
+                    var draggingRowKey = ui.draggable.data('keyValue');
+                    var targetRowKey = $(this).data('keyValue');
+
+                    $("#menu-tree-list").dxTreeList('instance').beginCustomLoading("");
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/mainmenu/reorder",
+                        data: {
+                            draggingRowKey: draggingRowKey,
+                            targetRowKey: targetRowKey,
+                            shiftPressed: event.shiftKey
+                        },
+                        success: function () {
+                            $("#menu-tree-list").dxTreeList('instance').endCustomLoading("");
+                            $treeElement.dxTreeList('instance').refresh();
+                        },
+                        error: function (e) {
+                            $("#menu-tree-list").dxTreeList('instance').endCustomLoading("");
+                            toastr["error"]("HTTP Status: " + e.status);
+                        }
+                    });
+
+                }
+            });
+        },
+
+    }
+
+    function cellCameraTemplate(cellElement, cellInfo) {
+        var customerId = cellInfo.row.data.CustomerId;
+        var docId = cellInfo.row.data.Id;
+        var icon = cellInfo.row.data.Icon;
+
+        cellElement.html('<div style="overflow:  auto ; width: 100%; height: 100%; padding-bottom:0px; width:100%;cursor:pointer;text-align:center;" data-docid="' + docId + '" ><i class="' + icon + '"></i></div>');
+    }
+</script>
+
+
+<div class="portlet full-height-content height-as-parent">
+    @(Html.DevExtreme().TreeList()
+            .ID("menu-tree-list")
+                    .DataSource(ds => ds.WebApi().RouteName("MainMenuApi").LoadAction("Get").DeleteAction("Delete").InsertAction("Post").UpdateAction("Put").Key("Id"))
+                    .KeyExpr("Id")
+                    .LoadPanel(s => s.ShowIndicator(true).ShowPane(true))
+                    .OnRowPrepared("mainmenu.menuTree_RowPrepared")
+                    .OnContentReady("mainmenu.menuTree_ContentReady")
+                    .OnCellClick("mainmenu.menuTree_CellClick")
+                    .ParentIdExpr("ParentId")
+                    .HasItemsExpr("HasItems")
+                    .SearchPanel(seachPanel => seachPanel.Visible(true))
+                    .RowAlternationEnabled(true)
+                    .Editing(editing => editing
+                        .Mode(GridEditMode.Row)
+                        .AllowAdding(true)
+                        .AllowUpdating(true)
+                        .AllowDeleting(true)
+                    )
+                    .Columns(columns =>
+                        {
+                            columns.Add()
+                                .DataField("Id")
+                                .Width(50)
+                                .AllowEditing(false);
+
+                            columns.Add()
+                                .DataField("Text")
+                                .Caption("Название пункта меню RU")
+                                .MinWidth(150)
+                                .ValidationRules(vr => vr.AddRequired());
+
+                            columns.Add()
+                                .DataField("TextRo")
+                                .Caption("Название пункта меню RO")
+                                .MinWidth(150)
+                                .ValidationRules(vr => vr.AddRequired());
+
+                            columns.Add()
+                                .DataField("TextEn")
+                                .Caption("Название пункта меню EN")
+                                .MinWidth(150)
+                                .ValidationRules(vr => vr.AddRequired());
+                                //.DataField("icon")
+
+                            columns.Add()
+                                .DataField("Location")
+                                .MinWidth(150)
+                                .Caption("URL для перехода");
+
+                            columns.Add()
+                                .DataField("PermissionEnumText")
+                                .MinWidth(100)
+                                .Caption("Enum значение");
+
+                            columns.Add()
+                                .DataField("Icon")
+                                .CellTemplate(new JS("cellCameraTemplate"))
+                                .Caption(Localizer["Значок"].Value);
+
+                            columns.Add()
+                                .DataField("JsFunction")
+                                .MinWidth(150)
+                                .Caption("JS функция");
+
+                            columns.Add()
+                                .DataField("IsActive")
+                                .MinWidth(50)
+                                .Caption("Активный")
+                                .DataType(GridColumnDataType.Boolean)
+                                .CalculateCellValue(@"function(rowData) { return rowData.IsActive == true; }");
+                        })
+            )
+</div>
+
+@(Html.DevExtreme().Popup()
+    .ID("popup-snapshorts")
+    .ElementAttr("class", "popup")
+    .Height(825)
+    .ShowTitle(true)
+    //.OnContentReady("scroll")
+    .MaxWidth(900)
+    .Title("Выбор значков")
+    .Visible(false)
+    .DragEnabled(true)
+    .ResizeEnabled(true)
+    .Shading(true)
+    .CloseOnOutsideClick(false)
+)
+
+
+<script>
+    var snapshortPopup = undefined;
+
+    $(function () {
+        snapshortPopup = $("#popup-snapshorts").dxPopup('instance');
+    });
+
+    $(function () {
+        mainmenu.dxTreeList = $("#menu-tree-list").dxTreeList('instance');
+
+        $(window).resize(function () {
+            mainmenu.dxTreeList.option("height", parseInt($("#all-portlets .height-as-parent").css('min-height')));
+        });
+    });
+
+</script>

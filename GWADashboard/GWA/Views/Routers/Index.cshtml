@@ -1,0 +1,122 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    Layout = null;
+}
+
+
+<script>
+    var routers = {
+        check: function () {
+            $.ajax({
+                url: "/api/buses/routes",
+            })
+        },
+
+        onlineCellTemplate: function (cellElement, cellInfo) {
+            debugger
+            if ((Date.parse(Date()) - Date.parse(cellInfo.value)) < 30000) {
+                cellElement.html("<span style=\"color: green\">ONLINE</span>");
+            }
+            else {
+                var date = new Date(cellInfo.value);
+                var y = date.getFullYear();
+                var M = date.getMonth();
+                var d = date.getDate();
+                
+                var H = date.getHours();
+                var m = date.getMinutes();
+                var s = date.getSeconds();
+                cellElement.html("<span style=\" color: red\">"+ d + "/" + M + "/" + y + " " + H + ":" + m + ":" + s + "</span>");
+            }
+        },
+
+        cellPrepared: function (e) {
+            if (e.rowType == 'header')
+                return;
+
+            if (e.column.dataField == "BusNr" && e.row.rowType == "data") {
+                e.cellElement.css("cursor", "text");
+            }
+            if (e.column.dataField == "Notes" && e.row.rowType == "data") {
+                e.cellElement.css("cursor", "text");                
+            }
+        }
+    }
+</script>
+
+
+<div class="portlet full-height-content height-as-parent">
+    <div class="accesspoints-gridscontainer">
+        @(Html.DevExtreme().DataGrid()
+                   .ID("routersDataGrid")
+                   .DataSource(ds => ds.WebApi().RouteName("RoutersApi").LoadAction("Get").InsertAction("Post").UpdateAction("Put").DeleteAction("Delete").Key("Id"))
+                   //.OnRowClick("routers.onRowClick")
+                   //.OnRowPrepared("routers.rowPrepared")
+                   .OnCellPrepared("routers.cellPrepared")
+                   .Editing(e => e
+                            .Mode(GridEditMode.Cell)
+                            .AllowAdding(false)
+                            .AllowUpdating(true)
+                            .AllowDeleting(false)
+                   )
+                   .Columns(c =>
+                   {
+                       c.Add()
+                            .DataField("Id")
+                            .Visible(false);
+
+                       c.Add()
+                            .DataField("Nr")
+                            .Width(60)
+                            .AllowEditing(false)
+                            .Caption(Localizer["Nr"].Value);
+
+                       c.Add()
+                            .DataField("BusRoute")
+                            .Width(150)
+                            .AllowEditing(false)
+                            .Caption(Localizer["Bus route"].Value);
+
+                        c.Add()
+                             .DataField("BusNr")
+                             .Width(150)
+                             .Caption(Localizer["Bus nr"].Value);
+
+                       c.Add()
+                            .DataField("Online")
+                            .CellTemplate(new JS("routers.onlineCellTemplate"))
+                            .AllowEditing(false)
+                            .Width(180)
+                            .Caption(Localizer["Last online"].Value);
+
+                       c.Add()
+                            .DataField("PlacedTime")
+                            .AllowEditing(false)
+                            .Width(180)
+                            .Caption(Localizer["Placed time"].Value);
+
+                       c.Add()
+                            .DataField("Model")
+                            .AllowEditing(false)
+                            .Caption(Localizer["Model"].Value);
+
+                        c.Add()
+                             .DataField("Notes")
+                             .Caption(Localizer["Notes"].Value);
+                   })
+        )
+    </div>
+</div>
+
+
+<script>
+    var snapshortPopup = undefined;
+
+    $(function () {
+
+    });
+
+</script>
+

@@ -1,0 +1,111 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@using GWA.Models.AccountViewModels
+@model LoginViewModel
+
+@{
+    Layout = "_LayoutLogin";
+    var data = new LoginViewModel();
+}
+<div class="login-form-container">
+    <form class="login-form">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <p class="field">
+                @Html.TextBoxFor(m => m.Login, new { placeholder = Localizer["Login"].Value, type = "text", name = "login", id="input-login"})
+                @*Html.ValidationMessageFor(m => m.Login)*@
+                <i class="fa fa-user icon-large"></i>
+            </p>
+
+            <p class="field">
+                @Html.TextBoxFor(m => m.Password, new { placeholder = Localizer["Password"].Value, type = "password", name = "password", id="input-password"})
+
+                @*Html.ValidationMessageFor(m => m.Password)*@
+                <i class="fa fa-lock icon-large"></i>
+            </p>
+
+            <div class="field-lastrow">
+                <span>
+                    @(Html.DevExtreme().Switch()
+                                                    .ID("rememberMe")
+                                                    .Name("RememberMe")
+                                                    .Value(false)
+                                                    .FocusStateEnabled(false)
+                    )
+                </span>
+                <span>
+                    @Localizer["Remember"].Value
+                </span>
+            </div>
+
+
+            <p class="submit">
+                <button type="submit" name="submit" id="button-submit">
+                    <i class="fa fa-arrow-right icon-large" style="margin-top: 2px; margin-left: 3px"></i>
+                </button>
+            </p>
+        }
+    </form>
+    <div class="select-language-partial">
+        @await Html.PartialAsync("_SelectLanguagePartial")
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(function () {
+            toastr.options = {
+                "preventDuplicates": true,
+                "preventOpenDuplicates": true,
+                "maxOpened": 1,
+                "positionClass": "toast-top-center"
+            }
+            $("[name='Login']").focus();
+            $("[name='Login']").select();
+        });
+
+        $(".login-form").on("submit", function (e) {
+            if (!isEmpty(this[0]) && !isEmpty(this[1])) {
+                $("#button-submit").html("<span class=\"button-lock\"></span>");
+                $("#button-submit").prop('disabled', true);
+
+                var data = $(this).serialize();
+                $.ajax({
+                    url: "/account/login",
+                    type: "post",
+                    data: data
+                }).fail(function (obj, error, status) {
+                    toastr["error"]("Ошибка в результате выполнения запроса.<br/> HTTP Статус: " + obj.status, { "timeOut": "5000" });
+                    console.log(obj, error, status);
+
+                }).done(function (json) {
+                    if (json.error == "") {
+                        var redirect = (getParameterByName("ReturnUrl") == null) ? "/" : getParameterByName("ReturnUrl");
+                        location.href = redirect;
+                    } else {
+                        toastr["error"](json.error, { "timeOut": "5000" });
+                        $("[name='login']").focus().select();
+                    }
+
+                }).always(function () {
+                    $("#button-submit").html("<i class=\"fa fa-arrow-right icon-large\" style=\"margin-top: 2px; margin-left: 3px\"></i>");
+                    $("#button-submit").prop('disabled', false);
+                });
+
+                e.preventDefault();
+            }
+        })
+        
+
+        function isEmpty(e) {
+            if (!e.value)
+                return true;
+
+            return (e.value == "");
+        }
+    </script>
+}

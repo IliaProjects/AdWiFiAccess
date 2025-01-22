@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GWA</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/lib/jquery-ui/jquery-ui.min.js"></script>
+
+    <link rel="icon" href="~/img/wifi-logo.png" />
+    @*<script src="https://cdn.jwplayer.com/libraries/naqWWaty.js"></script>*@
+
+    <link href="~/css/devextreme/dx.common.css" rel="stylesheet" />
+    <link href="~/css/devextreme/dx.material.orange.light.compact.css" rel="stylesheet" />
+
+    <script src="~/js/devextreme/dx.all.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.data.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.mvc.js"></script>
+
+
+    <link rel="stylesheet" href="~/lib/font-awesome-5.14/css/all.min.css" />
+    <link rel="stylesheet" href="~/lib/simple-line-icons/css/simple-line-icons.css" />
+    <link rel="stylesheet" href="~/lib/fonts-glyphicons/glyphicons.css" />
+</head>
+<body class="page-container-bg-solid page-header-fixed page-sidebar-closed-hide-logo page-md page-footer-fixed">
+    <div class="page-container">
+        <!--BEGIN SIDEBAR-->
+        @await Html.PartialAsync("_SideBar")
+        <!-- END SIDEBAR -->
+        <div class="page-content" id="all-portlets">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+        @RenderSection("Scripts", required: false)
+    </div>
+</body>
+</html>

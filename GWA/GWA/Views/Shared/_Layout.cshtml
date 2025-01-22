@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - GWA</title>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <link rel="icon" href="~/img/wifi-logo.png" />
+    <script src="https://cdn.jwplayer.com/libraries/uMVwAnwR.js"></script>
+    @*<script src="https://cdn.jwplayer.com/libraries/naqWWaty.js"></script>*@
+
+    @*<script async defer crossorigin="anonymous" src="~/lib/facebook/sdk.js"></script>*@
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <meta property="og:image" content="https://www.vostok.dp.ua/images/db/Wi-Fi.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="400" />
+    <meta property="og:image:height" content="300" />
+</head>
+<body>
+    @*<header>
+        <nav>
+            <a asp-area="" asp-controller="Home" asp-action="Index">GWA</a>
+        </nav>
+    </header>*@
+    <div>
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    @*<footer class="footer text-muted">
+        <div class="container">
+            &copy; 2020 - GWA
+        </div>
+    </footer>*@
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

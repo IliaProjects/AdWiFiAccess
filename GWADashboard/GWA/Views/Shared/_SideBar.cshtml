@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization;
+@using System.Collections;
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.Extensions.Logging;
+@using GWA.Classes;
+@using GWA.DataDashboard;
+
+@inject IHttpContextAccessor _httpContextAccessor;
+@inject DashboardDbContext _db;
+@inject ILoggerFactory loggerFactory;
+
+@{
+    var menuItems = Utils.GetUserMenu(_httpContextAccessor.HttpContext, _db);
+
+    string sidebarClosed = "";
+    _httpContextAccessor.HttpContext.Request.Cookies.TryGetValue("sidebar-closed", out sidebarClosed);
+    var addUlClass = (sidebarClosed == "true") ? "page-sidebar-menu-closed" : "";
+
+    var logger = loggerFactory.CreateLogger("View");
+}
+
+<nav class="sidebar">
+    <ul class="lisst-unstyled components">
+        @{
+
+            int i = 0;
+
+            foreach (var menuItem in menuItems)
+            {
+                if (!Utils.CheckPermission(_db, User, menuItem.permissionEnumText, logger))
+                {
+                    continue;
+                }
+
+                var action = (menuItem.jsFunction.Equals("") ? menuItem.location : menuItem.jsFunction);
+
+                <li class="active" id="menu-item-@menuItem.id">
+                    @{
+
+                        //Если НЕТ дочерних элементов
+                        if (!(menuItem.items.Count() > 0))
+                        {
+                            <a href="@Html.Raw($"javascript:{action};") " class="nav-link">
+                                <i class="@menuItem.icon"></i>
+                                <span class="title">@menuItem.text</span>
+                            </a>
+                        }
+
+                        //Если ЕСТЬ дочерние элементы
+                        else
+                        {
+                            <a href="@Html.Raw($"#sidebar-submenu-{i}")" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                                <i class="@menuItem.icon"></i>
+                                <span class="title">@menuItem.text</span>
+                            </a>
+                            <ul class="collapse lisst-unstyled" id="sidebar-submenu-@i">
+                                @await Html.PartialAsync("_SideBarSubMenu", menuItem.items)
+                            </ul>
+                        }
+                    }
+                </li>
+                i++;
+            }
+        }
+    </ul>
+</nav>

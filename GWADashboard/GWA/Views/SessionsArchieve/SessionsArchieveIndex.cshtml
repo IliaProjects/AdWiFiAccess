@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    Layout = null;
+}
+
+
+<script>
+    var sessionsArchieve = {
+    }
+</script>
+
+
+<div class="portlet full-height-content height-as-parent">
+    <div class="accesspoints-gridscontainer">
+        @(Html.DevExtreme().DataGrid()
+                   .ID("sessionsArchieveDataGrid")
+                   .DataSource(ds => ds.WebApi().RouteName("SessionsArchieveApi").LoadAction("Get").Key("Id"))
+                   .SearchPanel(s => s.Visible(true))
+                    /*.Columns(c =>
+                    {
+                    })*/
+        )
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+    });
+
+</script>

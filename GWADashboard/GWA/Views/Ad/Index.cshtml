@@ -1,0 +1,143 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    Layout = null;
+}
+
+
+<script>
+    var videos = {
+        dataGrid: undefined,
+    }
+
+    var pictures = {
+        dataGrid: undefined,
+        imageCellTemplate: function (cellElement, cellInfo) {
+            cellElement.html("<img class=\"imgcell-datagrid\" src=\"" + cellInfo.value + "\"></img>")
+        },
+        counterCellTemplate: function (cellElement, cellInfo) {
+            var amount = pictures.dataGrid.cellValue(cellInfo.rowIndex, "Amount");
+            var counter = cellInfo.value;
+            cellElement.html("<span>" + counter + "/" + amount + "</span>");
+        }
+    }
+</script>
+
+
+<div class="portlet full-height-content height-as-parent row">
+    <div id="videosDataGrid-container" class="dx-custom-widget dx-custom-last-in-column col-md-6">
+        @(Html.DevExtreme().DataGrid()
+                    .ID("videosDataGrid")
+                    .DataSource(ds => ds.WebApi().RouteName("AdVideosApi").LoadAction("Get").InsertAction("Post").UpdateAction("Put").DeleteAction("Delete").Key("Id"))
+                    //.OnRowClick("ad.onRowClick")
+                    //.OnRowPrepared("ad.rowPrepared")
+                    .SearchPanel(s => s.Visible(true))
+                    //.Grouping(gr => gr
+                    //         .ExpandMode(GridGroupingExpandMode.ButtonClick)
+                    //)
+                    .Editing(e => e
+                            .Mode(GridEditMode.Form)
+                            .AllowAdding(true)
+                            .AllowUpdating(true)
+                            .AllowDeleting(true)
+                            .Texts(t => t
+                                    .SaveRowChanges("Сохранить")
+                                    .CancelRowChanges("Отмена")
+                            )
+                    )
+                    .Columns(c =>
+                    {
+                        c.Add()
+                             .DataField("PlacedTime")
+                             .AllowEditing(false)
+                             .FormItem(f => f.Visible(false));
+                        c.Add()
+                             .DataField("Content");
+                        c.Add()
+                             .DataField("RedirectUrl");
+                        c.Add()
+                             .DataField("IsExecuted")
+                             .AllowEditing(false)
+                             .FormItem(f => f.Visible(false))
+                             .Width(90);
+                        c.Add()
+                             .DataField("Counter")
+                             .AllowEditing(false)
+                             .FormItem(f => f.Visible(false))
+                             .Width(120);
+                        c.Add()
+                             .DataField("Amount")
+                             .Visible(false);
+                        c.Add()
+                             .DataField("Notes");
+                    })
+        )
+    </div>
+    <div id="picturesDataGrid-container" class="dx-custom-widget dx-custom-last-in-row dx-custom-last-in-column col-md-6">
+        @(Html.DevExtreme().DataGrid()
+                    .ID("picturesDataGrid")
+                    .DataSource(ds => ds.WebApi().RouteName("AdPicturesApi").LoadAction("Get").InsertAction("Post").UpdateAction("Put").DeleteAction("Delete").Key("Id"))
+                    //.OnRowClick("ad.onRowClick")
+                    //.OnRowPrepared("ad.rowPrepared")
+                    .SearchPanel(s => s.Visible(true))
+                    //.Grouping(gr => gr
+                    //         .ExpandMode(GridGroupingExpandMode.ButtonClick)
+                    //)
+                    .Editing(e => e
+                            .Mode(GridEditMode.Form)
+                            .AllowAdding(true)
+                            .AllowUpdating(true)
+                            .AllowDeleting(true)
+                            .Texts(t => t
+                                    .SaveRowChanges("Сохранить")
+                                    .CancelRowChanges("Отмена")
+                            )
+                    )
+                    .Columns(c =>
+                    {
+                        c.Add()
+                             .DataField("PlacedTime")
+                             .AllowEditing(false)
+                             .FormItem(f => f.Visible(false));
+                        c.Add()
+                             .DataField("Content")
+                             .Width(80)
+                             .CellTemplate(new JS("pictures.imageCellTemplate"));
+                        c.Add()
+                             .DataField("RedirectUrl");
+                        c.Add()
+                             .DataField("IsExecuted")
+                             .AllowEditing(false)
+                             .FormItem(f => f.Visible(false))
+                             .Width(90);
+                        c.Add()
+                             .DataField("Counter")
+                             .CellTemplate(new JS("pictures.counterCellTemplate"))
+                             .AllowEditing(false)
+                             .FormItem(f => f.Visible(false))
+                             .Width(120);
+                        c.Add()
+                             .DataField("Amount")
+                             .Visible(false);
+                        c.Add()
+                             .DataField("Notes");
+                    })
+        )
+    </div>
+</div>
+
+
+    <script>
+        var snapshortPopup = undefined;
+
+        $(function () {
+            pictures.dataGrid = $("#picturesDataGrid").dxDataGrid("instance");
+            videos.dataGrid = $("#videosDataGrid").dxDataGrid("instance");
+            $(window).resize(function () {
+                $("#videosDataGrid-container").css("height", parseInt($("#all-portlets .height-as-parent").css('min-height'))/2);
+                $("#picturesDataGrid-container").css("height", parseInt($("#all-portlets .height-as-parent").css('min-height'))/2);
+            });
+        });
+
+    </script>

@@ -1,0 +1,35 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    Layout = null;
+}
+
+
+<script>
+    var presessions = {
+    }
+</script>
+
+
+<div class="portlet full-height-content height-as-parent">
+    <div class="accesspoints-gridscontainer">
+        @(Html.DevExtreme().DataGrid()
+                   .ID("presessionsDataGrid")
+                   .DataSource(ds => ds.WebApi().RouteName("PresessionsApi").LoadAction("Get").Key("Id"))
+                   .SearchPanel(s => s.Visible(true))
+                   .Columns(c =>
+                   {
+                       c.Add().DataField("");
+                       c.Add().DataField("");
+                   })
+        )
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+    });
+
+</script>

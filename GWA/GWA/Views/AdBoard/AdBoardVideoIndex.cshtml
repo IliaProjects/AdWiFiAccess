@@ -1,0 +1,80 @@
+﻿@using GWA.Models
+@model SessionAdParamModel
+
+<script>
+    var adboard = {
+        $$SessionId:    "@Model.SessionId",
+        $$Content:      "@Model.Content",
+
+        $adSec:         10,
+
+        timer:   undefined,
+        player:  undefined,
+        skipper: undefined,
+
+        init: function () {
+            adboard.player = jwplayer("jwplayer");
+            adboard.skipper = $("#skipper");
+            adboard.skipper.html(this.$adSec + "...");
+            //$("#views_amount_text").html(session.$$Counter + " просмотров");
+
+            adboard.timer = new AdTimer(this.$adSec, this.$$SessionId, function (e) {
+                if (e.toString().length < 5) {
+                    adboard.$adSec = e;
+                    adboard.skipper.html(adboard.$adSec + "...");
+                }
+                else {
+                    adboard.skipper.html("ПРОПУСТИТЬ");
+                    adboard.skipper.addClass("video-skipper-active");
+                    document.getElementById("skipper").addEventListener("click", function () {
+                        $.ajax({
+                            url: "/api/adboard",
+                            type: "put",
+                            data: {
+                                'sessionId': adboard.$$SessionId,
+                                'action': 1,
+                            },
+                            success: function () {
+                                window.location.href = e;
+                            },
+                        });
+                    });
+                }
+            });
+
+            adboard.player.setup({
+                playlist: this.$$Content,
+            });
+            adboard.player.on('play',
+                (function () {
+                        adboard.player.setFullscreen(true, true);
+                        adboard.skipper.removeClass("invisible");
+                        adboard.timer.start();
+                })
+            );
+            adboard.player.on('pause',
+                (function () {
+                    adboard.timer.pause();
+                })
+            );
+        },
+    }
+</script>
+
+<div id="jwplayer" class="video-player video-contentbox-horizontal"></div>
+<div id="skipper" class="video-skipper invisible"></div>
+<div id="views_amount_text" style="width:100%; text-align: center; color: gray; font-size: 20px;"></div>
+
+<script>
+    $(function () {
+        adboard.init();
+
+        adboard.player.on('ready', function () {
+            $(adboard.skipper.detach()).appendTo('#jwplayer');
+            $('#jwplayer').addClass("video-contentbox-horizontal");
+            $('#jwplayer').removeClass("jw-flag-aspect-mode");
+        })
+
+        setTimeout(function () { adboard.player.play() }, 4000);
+    });
+</script>

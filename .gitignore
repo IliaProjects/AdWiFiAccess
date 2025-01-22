@@ -1,0 +1,7 @@
+publish/
+bin/
+obj/
+.vs/
+tmp/
+lib/
+Logs/

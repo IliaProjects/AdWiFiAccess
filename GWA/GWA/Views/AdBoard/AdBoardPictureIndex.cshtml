@@ -1,0 +1,82 @@
+﻿@using GWA.Models
+@model SessionAdParamModel
+
+<script>
+        var adPictureBoard = {
+            WidthDevHeight: undefined,
+
+            $$SessionId:    "@Model.SessionId",
+            $$Content:      "@Model.Content",
+
+            $adSec:         10,
+
+            timer:   undefined,
+            skipper: undefined,
+
+            init: function () {
+                adPictureBoard.skipper = $("#pictureSkipper");
+                adPictureBoard.skipper.html(this.$adSec + "...");
+                //$("#views_amount_text").html(session.$$Counter + " просмотров");
+
+                adPictureBoard.timer = new AdTimer(this.$adSec, this.$$SessionId, function (e) {
+                    if (e.toString().length < 5) {
+                        adPictureBoard.$adSec = e;
+                        adPictureBoard.skipper.html(adPictureBoard.$adSec + "...");
+                    }
+                    else {
+                        adPictureBoard.skipper.html("ПРОПУСТИТЬ");
+                        adPictureBoard.skipper.addClass("video-skipper-active");
+                        document.getElementById("pictureSkipper").addEventListener("click", function () {
+                            $.ajax({
+                                url: "/api/adboard",
+                                type: "put",
+                                data: {
+                                    'sessionId': adPictureBoard.$$SessionId,
+                                    'action': 1,
+                                },
+                                success: function () {
+                                    debugger
+                                    window.location.href = e;
+                                },
+                            });
+                        });
+                    }
+                });
+
+                $("#adpicture").attr("src", adPictureBoard.$$Content);
+                
+                $(adPictureBoard.skipper.detach()).appendTo('#picture-box');
+
+            },
+        }
+    </script>
+
+    <div id="picture-box" class="picture-player">
+        <img id="adpicture" class="invisible" style="width: 100%; height: 100%" />
+    </div>
+    <div id="pictureSkipper" class="video-skipper invisible"></div>
+
+    <script>
+        $(function () {
+            adPictureBoard.init();
+
+            
+            $(window).resize(function () {
+                if (window.innerHeight > (window.innerWidth / adPictureBoard.WidthDevHeight)) {
+                    $("#picture-box").attr("style", "width: 100%; height: " + (window.innerWidth / adPictureBoard.WidthDevHeight) + "px");
+                }
+                else {
+                    $("#picture-box").attr("style", "width:" + (window.innerHeight * adPictureBoard.WidthDevHeight) + "px; height: 100%");
+                }
+            })
+            $('#adpicture').on('load', function () {
+                adPictureBoard.WidthDevHeight = parseInt($("#adpicture").css('width')) / parseInt($("#adpicture").css('height'));
+                $(window).resize()
+                
+                adPictureBoard.skipper.removeClass("invisible");
+                $('#adpicture').removeClass("invisible");
+                adPictureBoard.timer.start();
+            });
+
+        });
+    </script>

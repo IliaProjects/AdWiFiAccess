@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GWA", "GWA\GWA.csproj", "{FB6A1D5F-D438-4DA8-814A-F7A2F5BE83A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GWA.Data", "GWA.data\GWA.Data.csproj", "{294BC188-7C43-4203-A136-5410768C4DAE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GWA.DataLog", "GWA.DataLog\GWA.DataLog.csproj", "{47912AEE-FFF0-4A44-AF52-612B68F8D4DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB6A1D5F-D438-4DA8-814A-F7A2F5BE83A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB6A1D5F-D438-4DA8-814A-F7A2F5BE83A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB6A1D5F-D438-4DA8-814A-F7A2F5BE83A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB6A1D5F-D438-4DA8-814A-F7A2F5BE83A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{294BC188-7C43-4203-A136-5410768C4DAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{294BC188-7C43-4203-A136-5410768C4DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{294BC188-7C43-4203-A136-5410768C4DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{294BC188-7C43-4203-A136-5410768C4DAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47912AEE-FFF0-4A44-AF52-612B68F8D4DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47912AEE-FFF0-4A44-AF52-612B68F8D4DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47912AEE-FFF0-4A44-AF52-612B68F8D4DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47912AEE-FFF0-4A44-AF52-612B68F8D4DE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {68A3925A-6C46-47BA-90EF-CC746BCB9DFC}
+	EndGlobalSection
+EndGlobal

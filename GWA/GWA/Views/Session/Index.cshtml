@@ -1,0 +1,137 @@
+﻿@using GWA.Models
+@model SessionParamModel
+
+<script>
+
+    var session = {
+        $$SessionHoverId:   "@Model.SessionHoverId",
+        $$ShareLink:        "@Model.ShareLink",
+        $$SharePicture:     "@Model.SharePicture",
+
+        FB_async_init: function () {
+            window.fbAsyncInit = function () {
+                FB.init({
+                    appId: '2675839475989032',
+                    autoLogAppEvents: true,
+                    xfbml      : true,
+                    version: 'v9.0'
+                });
+            };
+        },
+
+        FB_post_feed: function () {
+            FB.ui({
+                    method: 'oauth',
+                    display: 'iframe'
+                },
+                function (rsp) {
+                    debugger
+                    var x = 5;
+                }
+            );
+            /*FB.login(function (response) {
+                $("#shareImage").attr("style", "display: none"); 
+            }, {
+                scope: 'public_profile'
+            });*/
+
+
+            /*FB.getLoginStatus(function (response) {
+                if (response.authResponse == null) {
+                    FB.login((response) => {
+                        debugger
+                        var x = 5;
+                    })
+                }
+            })*/
+
+
+            //response.authResponse == null
+            //FB.login((response) => { $("#shareImage").attr("style", "display: none"); })
+            //    var token = response.authResponse.accessToken;
+            //    var userid = response.authResponse.userID;
+            //    debugger
+            //    $.ajax({
+            //        url: "/api/test",
+            //        type: "get",
+            //        data: {
+            //            'token': token,
+            //            'userid': userid,
+            //        },
+            //    })
+                //FB.ui({
+                //    //method: 'fbml.dialog',
+                //    //fbml: (
+                //    //     '<div style="width:480px;border:1px black solid;">A small JavaScript library that allows you to harness ' +
+                //    //     'the power of Facebook, bringing the user\'s identity, ' +
+                //    //     'social graph and distribution power to your site.</div>'
+                //    //   ),
+                //    method: 'feed',
+                //    display: 'touch',
+                //    link: session.$$ShareLink,
+                //    ///size: {width:640,height:480}, width:640, height:480,
+                //    //action_properties: JSON.stringify({
+                //    //    object: {
+                //    //        'og:url': session.$$ShareLink,
+                //    //    }
+                //    //})
+                //}, this.responce);
+            //});
+        },
+
+        response: function (e) {
+            debugger
+                $("#shareImage").attr("style", "display: none");
+                //if (response && !response.error_message) {
+                    //$.ajax({
+                    //    url: "/api/session",
+                    //    type: "put",
+                    //    data: {
+                    //        'sessionId': session.$$SessionHoverId,
+                    //    },
+                    //    success: function (e) {
+                    //        session.redirect(e)
+                    //    },
+                    //});
+                //}
+        },
+
+        watch_promo: function () {
+            document.location.href = "/adboard?sessionId=" + session.$$SessionHoverId;
+        },
+
+        redirect: function (e) {
+            document.location.href = e;
+        }
+
+    }
+</script>
+
+<div class="index-container">
+    <img id="shareImage" class="share-image" />
+
+    <div id="helloline" class="span-container">
+        <span style="font-weight: 900;" class="index-span-caption">Приветствуем!</span>
+    </div>
+
+    <div class="span-container">
+        <span>Получите доступ к точке Wi-Fi, поделившись постом на Facebook:</span>
+    </div>
+    <img class="facebook-share-button" src="~/img/fbshare.png" onclick="session.FB_post_feed()" />
+
+    <div class="span-container">
+        <span>... или просмотрите рекламный ролик:</span>
+    </div>
+    <button class="watch-promo-button" onclick="session.watch_promo()">
+        <span style="font-weight: 700;">Перейти к рекламе</span>
+    </button>
+</div>
+
+
+    <script>
+        $(function () {
+            session.FB_async_init();
+            $("#shareImage").attr("src", session.$$SharePicture);
+            $("#helloline").html(new Date().toLocaleString());
+        })
+    </script>

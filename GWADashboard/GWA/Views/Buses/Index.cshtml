@@ -1,0 +1,71 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    Layout = null;
+}
+
+
+<script>
+    var buses = {
+        onRowClick: function (e) {
+            var key = e.component.getKeyByRowIndex(e.rowIndex);  
+            var expanded = e.component.isRowExpanded(key);  
+            if (expanded) {  
+                e.component.collapseRow(key);  
+            }  
+            else {  
+                e.component.expandRow(key);  
+            }  
+        },
+
+        rowPrepared: function (rowElement, rowInfo) {
+        
+        }
+    }
+</script>
+
+
+<div class="portlet full-height-content height-as-parent">
+    <div class="accesspoints-gridscontainer">
+            @(Html.DevExtreme().DataGrid()
+                       .ID("busesDataGrid")
+                       .DataSource(ds => ds.WebApi().RouteName("BusesApi").LoadAction("Get").InsertAction("Post").UpdateAction("Put").DeleteAction("Delete").Key("Id"))
+                       .OnRowClick("buses.onRowClick")
+                       .OnRowPrepared("buses.rowPrepared")
+                       .SearchPanel(s => s.Visible(true))
+                       //.Grouping(gr => gr
+                       //         .ExpandMode(GridGroupingExpandMode.ButtonClick)
+                       //)
+                       .Editing(e => e
+                                .Mode(GridEditMode.Form)
+                                .AllowAdding(true)
+                                .AllowUpdating(true)
+                                .AllowDeleting(true)
+                                .Texts(t => t
+                                        .SaveRowChanges("Сохранить")
+                                        .CancelRowChanges("Отмена")
+                                )
+                       )
+                       .Columns(c =>
+                       {
+                           c.Add()
+                                .DataField("Nr");
+                           c.Add()
+                                .GroupIndex(0)
+                                .DataField("Route");
+                           c.Add()
+                                .DataField("Notes");
+                       })
+            )
+    </div>
+</div>
+
+
+<script>
+    var snapshortPopup = undefined;
+
+    $(function () {
+    });
+
+</script>
